@@ -1,5 +1,5 @@
 ng.module('smart-table')
-  .controller('stTableController', ['$scope', '$parse', '$filter', '$attrs', function StTableController ($scope, $parse, $filter, $attrs) {
+  .controller('stTableController', ['$scope', '$parse', '$filter', '$attrs', 'stConfig', function StTableController ($scope, $parse, $filter, $attrs, stConfig) {
     var propertyName = $attrs.stTable;
     var displayGetter = $parse(propertyName);
     var displaySetter = displayGetter.assign;
@@ -95,10 +95,26 @@ ng.module('smart-table')
     this.pipe = function pipe () {
       var pagination = tableState.pagination;
       var output;
-      filtered = tableState.search.predicateObject ? filter(safeCopy, tableState.search.predicateObject) : safeCopy;
-      if (tableState.sort.predicate) {
-        filtered = orderBy(filtered, tableState.sort.predicate, tableState.sort.reverse);
+
+      if(stConfig.searchType.server) {
+        var config = {
+          params: {
+            orderBy: tableState.sort,
+            filter: tableState.search,
+            page: pagination
+          }
+        };
+        $scope[$attrs.stSearchFn](config).success(function (res) {
+          filtered = res;
+        });        
       }
+      else {
+        filtered = tableState.search.predicateObject ? filter(safeCopy, tableState.search.predicateObject) : safeCopy;
+        if (tableState.sort.predicate) {
+          filtered = orderBy(filtered, tableState.sort.predicate, tableState.sort.reverse);
+        }
+      }
+
       if (pagination.number !== undefined) {
         pagination.numberOfPages = filtered.length > 0 ? Math.ceil(filtered.length / pagination.number) : 1;
         pagination.start = pagination.start >= filtered.length ? (pagination.numberOfPages - 1) * pagination.number : pagination.start;
