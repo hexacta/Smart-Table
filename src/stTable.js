@@ -94,14 +94,15 @@ ng.module('smart-table')
      */
     this.pipe = function pipe () {
       if(stConfig.searchType.server) {
-        serverSearch();
+        this.serverSearch();
       }
       else {
-        localSearch();
+        this.localSearch();
       }
     };
 
     this.serverSearch = function serverSearch() {
+      var self = this;
       var pagination = tableState.pagination;
       var config = {
         params: {
@@ -115,18 +116,20 @@ ng.module('smart-table')
 
       $scope[$attrs.stSearchFn](config).success(function (res) {
         filtered = res[0].collection;
-        var output = paginate(pagination, res[0].length);
+        var output = self.paginate(pagination, res[0].length);
         displaySetter($scope, output || filtered);
-      });       
+      });
+
     };
 
     this.localSearch = function localSearch() {
+      var self = this;
       var pagination = tableState.pagination;
       filtered = tableState.search.predicateObject ? filter(safeCopy, tableState.search.predicateObject) : safeCopy;
         if (tableState.sort.predicate) {
           filtered = orderBy(filtered, tableState.sort.predicate, tableState.sort.reverse);
         }
-        var output = paginate(pagination, filtered.length);
+        var output = self.paginate(pagination, filtered.length);
         displaySetter($scope, output || filtered);
     };
 
