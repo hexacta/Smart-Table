@@ -12,7 +12,8 @@ ng.module('smart-table')
       search: {},
       pagination: {
         start: 0
-      }
+      },
+      columns: []
     };
     var filtered;
     var pipeAfterSafeCopy = true;
@@ -110,7 +111,8 @@ ng.module('smart-table')
           reverse: tableState.sort.reverse,
           filter: tableState.search.predicateObject? tableState.search.predicateObject.$ : undefined,
           offset: pagination.start,
-          pageSize: pagination.number
+          pageSize: pagination.number,
+          columns: tableState.columns
         }
       };
 

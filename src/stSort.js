@@ -18,6 +18,8 @@ ng.module('smart-table')
           sortDefault = scope.$eval(attr.stSortDefault) !== undefined ? scope.$eval(attr.stSortDefault) : attr.stSortDefault;
         }
 
+        ctrl.tableState().columns.push(predicate);
+
         //view --> table state
         function sort () {
           index++;
