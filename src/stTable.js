@@ -136,7 +136,7 @@ ng.module('smart-table')
     this.paginate = function paginate (pagination, collectionLength) {
       if (pagination.number !== undefined) {
         pagination.numberOfPages = collectionLength > 0 ? Math.ceil(collectionLength / pagination.number) : 1;
-        pagination.start = pagination.start >= filtered.length ? (pagination.numberOfPages - 1) * pagination.number : pagination.start;
+        pagination.start = pagination.start >= collectionLength ? (pagination.numberOfPages - 1) * pagination.number : pagination.start;
         return filtered.slice(pagination.start, pagination.start + parseInt(pagination.number));
       }
       else {
