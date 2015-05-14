@@ -93,34 +93,52 @@ ng.module('smart-table')
      * this will chain the operations of sorting and filtering based on the current table state (sort options, filtering, ect)
      */
     this.pipe = function pipe () {
-      var pagination = tableState.pagination;
-      var output;
-
       if(stConfig.searchType.server) {
-        var config = {
-          params: {
-            orderBy: tableState.sort,
-            filter: tableState.search,
-            page: pagination
-          }
-        };
-        $scope[$attrs.stSearchFn](config).success(function (res) {
-          filtered = res;
-        });        
+        serverSearch();
       }
       else {
-        filtered = tableState.search.predicateObject ? filter(safeCopy, tableState.search.predicateObject) : safeCopy;
+        localSearch();
+      }
+    };
+
+    this.serverSearch = function serverSearch() {
+      var pagination = tableState.pagination;
+      var config = {
+        params: {
+          orderBy: tableState.sort.predicate,
+          reverse: tableState.sort.reverse,
+          filter: tableState.search.predicateObject? tableState.search.predicateObject.$ : undefined,
+          offset: pagination.start,
+          pageSize: pagination.number
+        }
+      };
+
+      $scope[$attrs.stSearchFn](config).success(function (res) {
+        filtered = res[0].collection;
+        var output = paginate(pagination, res[0].length);
+        displaySetter($scope, output || filtered);
+      });       
+    };
+
+    this.localSearch = function localSearch() {
+      var pagination = tableState.pagination;
+      filtered = tableState.search.predicateObject ? filter(safeCopy, tableState.search.predicateObject) : safeCopy;
         if (tableState.sort.predicate) {
           filtered = orderBy(filtered, tableState.sort.predicate, tableState.sort.reverse);
         }
-      }
+        var output = paginate(pagination, filtered.length);
+        displaySetter($scope, output || filtered);
+    };
 
+    this.paginate = function paginate (pagination, collectionLength) {
       if (pagination.number !== undefined) {
-        pagination.numberOfPages = filtered.length > 0 ? Math.ceil(filtered.length / pagination.number) : 1;
+        pagination.numberOfPages = collectionLength > 0 ? Math.ceil(collectionLength / pagination.number) : 1;
         pagination.start = pagination.start >= filtered.length ? (pagination.numberOfPages - 1) * pagination.number : pagination.start;
-        output = filtered.slice(pagination.start, pagination.start + parseInt(pagination.number));
+        return filtered.slice(pagination.start, pagination.start + parseInt(pagination.number));
       }
-      displaySetter($scope, output || filtered);
+      else {
+        return [];
+      }
     };
 
     /**
