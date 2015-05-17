@@ -105,18 +105,16 @@ ng.module('smart-table')
     this.serverSearch = function serverSearch() {
       var self = this;
       var pagination = tableState.pagination;
-      var config = {
-        params: {
-          orderBy: tableState.sort.predicate,
-          reverse: tableState.sort.reverse,
-          filter: tableState.search.predicateObject? tableState.search.predicateObject.$ : undefined,
-          offset: pagination.start,
-          pageSize: pagination.number,
-          columns: tableState.columns
-        }
+      var params = {
+        orderBy: tableState.sort.predicate,
+        reverse: tableState.sort.reverse,
+        filter: tableState.search.predicateObject? tableState.search.predicateObject.$ : undefined,
+        offset: pagination.start,
+        pageSize: pagination.number,
+        columns: tableState.columns
       };
 
-      $scope[$attrs.stSearchFn](config).success(function (res) {
+      $scope[$attrs.stSearchFn](params).then(function (res) {
         filtered = res[0].collection;
         var output = self.paginate(pagination, res[0].length);
         displaySetter($scope, output || filtered);
