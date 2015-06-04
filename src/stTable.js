@@ -1,6 +1,7 @@
 ng.module('smart-table')
   .controller('stTableController', ['$scope', '$parse', '$filter', '$attrs', 'stConfig', function StTableController ($scope, $parse, $filter, $attrs, stConfig) {
     var propertyName = $attrs.stTable;
+    var localSearch = $attrs.localSearch =='true' || false;
     var displayGetter = $parse(propertyName);
     var displaySetter = displayGetter.assign;
     var safeGetter;
@@ -94,11 +95,11 @@ ng.module('smart-table')
      * this will chain the operations of sorting and filtering based on the current table state (sort options, filtering, ect)
      */
     this.pipe = function pipe () {
-      if(stConfig.searchType.server) {
-        this.serverSearch();
+      if(localSearch) {
+        this.localSearch();
       }
       else {
-        this.localSearch();
+        this.serverSearch();
       }
     };
 
