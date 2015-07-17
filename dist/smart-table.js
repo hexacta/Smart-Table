@@ -155,7 +155,15 @@ ng.module('smart-table')
       $scope[$attrs.stSearchFn](params).then(function (res) {
         filtered = res[0].collection;
         var output = self.paginate(pagination, res[0].length);
-        displaySetter($scope, output || filtered);
+        if(params.offset == pagination.start){
+          displaySetter($scope, output || filtered);
+        } else{
+          params.offset = pagination.start;
+          $scope[$attrs.stSearchFn](params).then(function (res){
+            filtered = res[0].collection;
+            displaySetter($scope, filtered);
+          })
+        }
       });
 
     };
