@@ -21,7 +21,6 @@ ng.module('smart-table')
 
         scope.currentPage = 1;
         scope.pages = [];
-        scope.elements = ctrl.getElements();
 
         function redraw () {
           var paginationState = ctrl.tableState().pagination;

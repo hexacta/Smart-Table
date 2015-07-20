@@ -57,7 +57,6 @@ ng.module('smart-table')
     var pipeAfterSafeCopy = true;
     var ctrl = this;
     var lastSelected;
-    var elements = {};
 
     function copyRefs (src) {
       return src ? [].concat(src) : [];
@@ -139,7 +138,6 @@ ng.module('smart-table')
       else {
         this.serverSearch();
       }
-      this.recalculateElements();
     };
 
     this.serverSearch = function serverSearch() {
@@ -260,26 +258,6 @@ ng.module('smart-table')
     this.preventPipeOnWatch = function preventPipe () {
       pipeAfterSafeCopy = false;
     };
-
-    this.getElements = function getElements() {
-      return elements;
-    };
-
-    this.recalculateElements = function recalculateElements() {
-      $scope[$attrs.stSearchFn]({
-        orderBy: tableState.sort.predicate,
-        reverse: tableState.sort.reverse,
-        filter: tableState.search.predicateObject? tableState.search.predicateObject.$ : undefined,
-        offset: tableState.pagination.start,
-        columns: tableState.columns
-      }).then(function (res) {
-        elements.count = res[0].length;
-      });
-    };
-
-    this.recalculateElements();
-
-
   }])
   .directive('stTable', function () {
     return {
@@ -481,7 +459,6 @@ ng.module('smart-table')
 
         scope.currentPage = 1;
         scope.pages = [];
-        scope.elements = ctrl.getElements();
 
         function redraw () {
           var paginationState = ctrl.tableState().pagination;
