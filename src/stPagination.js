@@ -42,8 +42,10 @@ ng.module('smart-table')
           scope.pages = [];
           scope.numPages = paginationState.numberOfPages;
 
-          for (i = start; i < end; i++) {
-            scope.pages.push(i);
+          if (paginationState.numberOfPages){
+            for (i = start; i < end; i++) {
+              scope.pages.push(i);
+            }
           }
 
           if (prevPage !== scope.currentPage) {
