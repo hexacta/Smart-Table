@@ -37,6 +37,12 @@ ng.module('smart-table')
             promise = null;
           }, throttle);
         });
+
+        element.bind('click', function (evt) {
+          if(attr.type == 'button'){
+            ctrl.pipe();
+          }
+        });
       }
     };
   }]);
