@@ -20,7 +20,7 @@ ng.module('smart-table')
     var pipeAfterSafeCopy = true;
     var ctrl = this;
     var lastSelected;
-    var elements = {};
+    var elements = {count: 0};
 
     function copyRefs (src) {
       return src ? [].concat(src) : [];
@@ -102,7 +102,6 @@ ng.module('smart-table')
       else {
         this.serverSearch();
       }
-      this.recalculateElements();
     };
 
     this.serverSearch = function serverSearch() {
@@ -118,6 +117,7 @@ ng.module('smart-table')
       };
 
       $scope[$attrs.stSearchFn](params).then(function (res) {
+        elements.count = res[0].length;
         filtered = res[0].collection;
         var output = self.paginate(pagination, res[0].length);
         if(params.offset == pagination.start){
@@ -136,11 +136,12 @@ ng.module('smart-table')
       var self = this;
       var pagination = tableState.pagination;
       filtered = tableState.search.predicateObject ? filter(safeCopy, tableState.search.predicateObject) : safeCopy;
-        if (tableState.sort.predicate) {
-          filtered = orderBy(filtered, tableState.sort.predicate, tableState.sort.reverse);
-        }
-        var output = self.paginate(pagination, filtered.length);
-        displaySetter($scope, output || filtered);
+      if (tableState.sort.predicate) {
+        filtered = orderBy(filtered, tableState.sort.predicate, tableState.sort.reverse);
+      }
+      var output = self.paginate(pagination, filtered.length);
+      displaySetter($scope, output || filtered);
+      elements.count = safeCopy.length;
     };
 
     this.paginate = function paginate (pagination, collectionLength) {
@@ -229,22 +230,6 @@ ng.module('smart-table')
 
     this.getElements = function getElements() {
       return elements;
-    };
-
-    this.recalculateElements = function recalculateElements() {
-      if(localSearch){
-        elements.count = safeCopy.length;
-      } else{
-        $scope[$attrs.stSearchFn]({
-          orderBy: tableState.sort.predicate,
-          reverse: tableState.sort.reverse,
-          filter: tableState.search.predicateObject? tableState.search.predicateObject.$ : undefined,
-          offset: tableState.pagination.start,
-          columns: tableState.columns
-        }).then(function (res) {
-          elements.count = res[0].length;
-        });
-      }
     };
 
   }])
