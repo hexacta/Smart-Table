@@ -96,6 +96,7 @@ ng.module('smart-table')
      * this will chain the operations of sorting and filtering based on the current table state (sort options, filtering, ect)
      */
     this.pipe = function pipe () {
+      tableState.pagination.number = tableState.pagination.number ? tableState.pagination.number : stConfig.pagination.itemsByPage;
       if(localSearch) {
         this.localSearch();
       }
